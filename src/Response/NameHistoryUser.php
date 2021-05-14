@@ -22,7 +22,7 @@ class NameHistoryUser
         return $this->name;
     }
 
-    public function getChangedToAt(): int
+    public function getChangedToAt(): ?int
     {
         return $this->changedToAt;
     }
