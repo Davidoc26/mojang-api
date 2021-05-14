@@ -1,0 +1,27 @@
+{
+  "name": "davidoc26/mojang-api",
+  "description": "Simple Mojang-API class",
+  "license": "MIT",
+  "keywords": [
+    "minecraft",
+    "MojangAPI",
+    "php"
+  ],
+  "authors": [
+    {
+      "name": "David",
+      "email": "dav.eritsyan@gmail.com"
+    }
+  ],
+  "require": {
+    "php": ">=7.4",
+    "ext-curl": "*",
+    "ext-gd": "*",
+    "ext-json": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "MojangAPI\\": "src"
+    }
+  }
+}
