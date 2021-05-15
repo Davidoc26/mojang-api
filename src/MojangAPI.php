@@ -6,53 +6,29 @@ namespace MojangAPI;
 use MojangAPI\Exception\IllegalArgumentException;
 use MojangAPI\Renderer\Renderer;
 use MojangAPI\Response\NameHistoryUser;
+use MojangAPI\Response\Service;
 use MojangAPI\Response\User;
-use stdClass;
 
 
 class MojangAPI
 {
-    const ALL_SERVICES = true;
-    const MINECRAFT_NET = 0;
-    const SESSION_MINECRAFT_NET = 1;
-    const ACCOUNT_MOJANG_COM = 2;
-    const AUTHSERVER_MOJANG_COM = 3;
-    const SESSIONSERVER_MOJANG_COM = 4;
-    const API_MOJANG_COM = 5;
-    const TEXTURES_MINECRAFT_NET = 6;
-    const MOJANG_COM = 7;
-
     /**
      * Return status of various Mojang services.
      *
      * @link https://wiki.vg/Mojang_API#API_Status
-     * @param $type
-     * @return array|stdClass
+     * @return array
      */
-    public static function apiStatus($type = MojangAPI::ALL_SERVICES)
+    public static function apiStatus(): array
     {
-        $response = self::request("https://status.mojang.com/check");
+        $response = self::request('https://status.mojang.com/check');
         $response = json_decode($response);
-        if ($type === MojangAPI::ALL_SERVICES) {
-            $statuses = [];
-            foreach ($response as $value) {
-                foreach ($value as $k => $v) {
-                    $service = new stdClass();
-                    $service->name = $k;
-                    $service->status = $v;
-                    $statuses[] = $service;
-                }
+        $services = [];
+        foreach ($response as $item) {
+            foreach ($item as $name => $status) {
+                $services[] = new Service($name, $status);
             }
-            return $statuses;
-        } else {
-            $response = (array)$response[$type];
-            $service = new stdClass();
-            foreach ($response as $k => $v) {
-                $service->name = $k;
-                $service->status = $v;
-            }
-            return $service;
         }
+        return $services;
     }
 
     /**
@@ -145,10 +121,10 @@ class MojangAPI
     /**
      * Render player head from skin url.
      *
-     * @see MojangAPI::getSkinUrl()
      * @param string $url
      * @param int $size
      * @return string
+     * @see MojangAPI::getSkinUrl()
      */
     public static function renderHead(string $url, int $size = 64): string
     {
