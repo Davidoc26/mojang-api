@@ -3,9 +3,12 @@ declare(strict_types=1);
 
 namespace MojangAPI;
 
+use MojangAPI\Exception\ForbiddenOperationException;
 use MojangAPI\Exception\IllegalArgumentException;
 use MojangAPI\Renderer\Renderer;
+use MojangAPI\Response\AuthenticatedUser;
 use MojangAPI\Response\NameHistoryUser;
+use MojangAPI\Response\ProfileInformation;
 use MojangAPI\Response\Service;
 use MojangAPI\Response\User;
 
@@ -129,6 +132,65 @@ class MojangAPI
     public static function renderHead(string $url, int $size = 64): string
     {
         return Renderer::renderHead($url, $size);
+    }
+
+    /**
+     * Authenticates a user using their password.
+     * @throws ForbiddenOperationException
+     * @link https://wiki.vg/Authentication#Authenticate
+     */
+    public static function authenticate(string $email, string $password): AuthenticatedUser
+    {
+        $data = [
+            "agent" => [
+                "name" => "Minecraft",
+                "version" => 1,
+            ],
+            "username" => "$email",
+            "password" => "$password",
+        ];
+
+        $curl = curl_init("https://authserver.mojang.com/authenticate");
+        curl_setopt($curl, CURLOPT_POST, true);
+        curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($data));
+        curl_setopt($curl, CURLOPT_HTTPHEADER, [
+            'Content-Type: application/json'
+        ]);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        $client = curl_exec($curl);
+        $client = json_decode($client, true);
+
+        if (is_null($client)) {
+            throw new ForbiddenOperationException('Too many login attempts');
+        }
+        if (array_key_exists('error', $client)) {
+            throw new ForbiddenOperationException($client['errorMessage']);
+        }
+
+        return new AuthenticatedUser($client);
+    }
+
+    /**
+     * Fetches information about the current account
+     * @param string $token
+     * @return ProfileInformation
+     * @link https://wiki.vg/Mojang_API#Profile_Information
+     */
+    public static function getProfileInformation(string $token): ProfileInformation
+    {
+        $response = self::authRequest("https://api.minecraftservices.com/minecraft/profile", "GET", $token);
+        return new ProfileInformation(json_decode($response, true));
+    }
+
+    private static function authRequest(string $url, string $method, string $token)
+    {
+        $curl = curl_init($url);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, strtoupper($method));
+        curl_setopt($curl, CURLOPT_HTTPHEADER, [
+            "Authorization: Bearer $token"
+        ]);
+        return curl_exec($curl);
     }
 
     private static function request(string $url, bool $isPost = false, array $data = null)
