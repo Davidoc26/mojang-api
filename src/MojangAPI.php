@@ -136,6 +136,9 @@ class MojangAPI
 
     /**
      * Authenticates a user using their password.
+     * @param string $email
+     * @param string $password
+     * @return AuthenticatedUser
      * @throws ForbiddenOperationException
      * @link https://wiki.vg/Authentication#Authenticate
      */
@@ -180,6 +183,23 @@ class MojangAPI
     {
         $response = self::authRequest("https://api.minecraftservices.com/minecraft/profile", "GET", $token);
         return new ProfileInformation(json_decode($response, true));
+    }
+
+    /**
+     * Check if the given name is available.
+     * @param $name
+     * @param $token
+     * @return bool
+     * @link https://wiki.vg/Mojang_API#Name_Availability
+     */
+    public static function nameAvailability($name, $token): bool
+    {
+        $response = self::authRequest("https://api.minecraftservices.com/minecraft/profile/name/$name/available", 'GET', $token);
+        $response = json_decode($response);
+        if ($response->status === "AVAILABLE") {
+            return true;
+        }
+        return false;
     }
 
     private static function authRequest(string $url, string $method, string $token)
