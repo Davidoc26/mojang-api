@@ -7,7 +7,7 @@ namespace MojangAPI\Renderer;
 
 class Renderer
 {
-    public static function renderHead(string $url, int $size): string
+    public static function renderHead(string $url, int $size, bool $onlyBase64 = false): string
     {
         $skin = imagecreatefrompng($url);
         $head = imagecreatetruecolor($size, $size);
@@ -21,6 +21,10 @@ class Renderer
 
         imagedestroy($skin);
         imagedestroy($head);
+
+        if ($onlyBase64) {
+            return base64_encode($output);
+        }
 
         return "data:image/png;base64," . base64_encode($output);
     }

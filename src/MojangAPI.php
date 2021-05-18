@@ -126,12 +126,13 @@ class MojangAPI
      *
      * @param string $url
      * @param int $size
+     * @param bool $onlyBase64
      * @return string
      * @see MojangAPI::getSkinUrl()
      */
-    public static function renderHead(string $url, int $size = 64): string
+    public static function renderHead(string $url, int $size = 64, bool $onlyBase64 = false): string
     {
-        return Renderer::renderHead($url, $size);
+        return Renderer::renderHead($url, $size, $onlyBase64);
     }
 
     /**
