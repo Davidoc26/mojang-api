@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace MojangAPI;
 
+use GuzzleHttp\Client;
 use MojangAPI\Exception\ForbiddenOperationException;
 use MojangAPI\Exception\IllegalArgumentException;
 use MojangAPI\Renderer\Renderer;
@@ -15,6 +16,15 @@ use MojangAPI\Response\User;
 
 class MojangAPI
 {
+    private Client $client;
+
+
+    public function __construct()
+    {
+        $this->client = new Client();
+    }
+
+
     /**
      * Return status of various Mojang services.
      *
