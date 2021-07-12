@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace MojangAPI\Response;
 
 
-class NameHistoryUser
+class NameHistoryResponse implements User
 {
-
     private string $name;
     private ?int $changedToAt;
 

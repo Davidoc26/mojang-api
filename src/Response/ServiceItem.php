@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MojangAPI\Response;
 
 
-class Service
+class ServiceItem
 {
     private string $name;
     private string $status;

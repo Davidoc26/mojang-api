@@ -4,43 +4,48 @@ declare(strict_types=1);
 namespace MojangAPI;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Psr7\Response;
+use MojangAPI\Collection\ServiceItemCollection;
 use MojangAPI\Exception\ForbiddenOperationException;
 use MojangAPI\Exception\IllegalArgumentException;
 use MojangAPI\Renderer\Renderer;
-use MojangAPI\Response\AuthenticatedUser;
-use MojangAPI\Response\NameHistoryUser;
-use MojangAPI\Response\ProfileInformation;
-use MojangAPI\Response\Service;
-use MojangAPI\Response\User;
+use MojangAPI\Response\AuthenticatedUserResponse;
+use MojangAPI\Response\NameHistoryResponse;
+use MojangAPI\Response\ProfileInformationResponse;
+use MojangAPI\Response\ProfileResponse;
+use MojangAPI\Response\ServiceItem;
+use MojangAPI\Response\UserResponse;
 
 
 class MojangAPI
 {
     private Client $client;
 
-
     public function __construct()
     {
         $this->client = new Client();
     }
 
-
     /**
      * Return status of various Mojang services.
      *
      * @link https://wiki.vg/Mojang_API#API_Status
-     * @return array
+     * @return ServiceItemCollection
+     * @throws GuzzleException
      */
-    public static function apiStatus(): array
+    public function apiStatus(): ServiceItemCollection
     {
-        $response = self::request('https://status.mojang.com/check');
-        $response = json_decode($response);
-        $services = [];
-        foreach ($response as $item) {
-            foreach ($item as $name => $status) {
-                $services[] = new Service($name, $status);
+        $response = $this->client->get('https://status.mojang.com/check');
+        $response = json_decode($response->getBody()->getContents());
+
+        $services = new ServiceItemCollection();
+        foreach ($response as $service) {
+            foreach ($service as $name => $status) {
+                $services->add(new ServiceItem($name, $status));
             }
         }
+
         return $services;
     }
 
@@ -50,11 +55,19 @@ class MojangAPI
      * @link https://wiki.vg/Mojang_API#Username_to_UUID
      * @param string $nickname
      * @return string
+     * @throws GuzzleException|IllegalArgumentException
      */
-    public static function getUuid(string $nickname): string
+    public function getUuid(string $nickname): string
     {
-        $response = self::request("https://api.mojang.com/users/profiles/minecraft/$nickname");
-        return json_decode($response)->id;
+        $response = $this->client->request('GET', "https://api.mojang.com/users/profiles/minecraft/$nickname");
+
+        $uuid = @$this->getDecodedResponse($response)->id;
+
+        if (empty($uuid)) {
+            throw new IllegalArgumentException(sprintf("User %s not found", $nickname), $response->getStatusCode());
+        }
+
+        return $uuid;
     }
 
     /**
@@ -62,12 +75,11 @@ class MojangAPI
      *
      * @param string $uuid
      * @return string
-     * @link
+     * @throws GuzzleException
      */
-    public static function getSkinUrl(string $uuid): string
+    public function getSkinUrl(string $uuid): string
     {
-        $response = self::getProfile($uuid);
-        return $response->properties[0]->value->textures->SKIN->url;
+        return $this->getProfile($uuid)->getSkinUrl();
     }
 
     /**
@@ -77,37 +89,52 @@ class MojangAPI
      * @link https://wiki.vg/Mojang_API#UUID_to_Profile_and_Skin.2FCape
      * @param string $uuid
      * @param bool $decodeBase64
-     * @return mixed
+     * @return ProfileResponse
+     * @throws GuzzleException
      */
-    public static function getProfile(string $uuid, bool $decodeBase64 = true)
+    public function getProfile(string $uuid, bool $decodeBase64 = true): ProfileResponse
     {
-        $response = self::request("https://sessionserver.mojang.com/session/minecraft/profile/$uuid");
-        $response = json_decode($response);
+        $response = $this->client->get(sprintf("https://sessionserver.mojang.com/session/minecraft/profile/%s", $uuid));
+
+        $response = $this->getDecodedResponse($response);
+
         if ($decodeBase64) {
             $response->properties[0]->value = json_decode(base64_decode($response->properties[0]->value));
         }
-        return $response;
+
+        return new ProfileResponse($response);
     }
 
     /**
      * Return players UUIDs.
      *
      * @link https://wiki.vg/Mojang_API#Usernames_to_UUIDs
-     * @param $nicknames
-     * @return array
+     * @param array $nicknames
+     * @param bool $toUserResponse
+     * @return UserResponse[]|array
+     * @throws GuzzleException
      * @throws IllegalArgumentException
      */
-    public static function usernamesToUuids($nicknames): array
+    public function usernamesToUuids(array $nicknames, $toUserResponse = true): array
     {
         if (count($nicknames) > 10) {
             throw new IllegalArgumentException('Not more that 10 profile name per call is allowed.');
         }
-        $response = self::request("https://api.mojang.com/profiles/minecraft", true, $nicknames);
+
+        $response = ($this->client->post('https://api.mojang.com/profiles/minecraft', [
+            'json' => $nicknames,
+        ]))->getBody()->getContents();
         $response = json_decode($response);
+
         $users = [];
         foreach ($response as $item) {
-            $users[] = new User($item->name, $item->id);
+            if ($toUserResponse) {
+                $users[] = new UserResponse($this, $item->name, $item->id);
+                continue;
+            }
+            $users[$item->name] = $item->id;
         }
+
         return $users;
     }
 
@@ -117,17 +144,19 @@ class MojangAPI
      * @link https://wiki.vg/Mojang_API#UUID_to_Name_History
      * @param string $uuid
      * @return array
+     * @throws GuzzleException
      */
-    public static function getNameHistory(string $uuid): array
+    public function getNameHistory(string $uuid): array
     {
-        $response = self::request("https://api.mojang.com/user/profiles/$uuid/names");
-        $response = json_decode($response);
+        $response = $this->client->get(sprintf('https://api.mojang.com/user/profiles/%s/names', $uuid));
+        $response = json_decode($response->getBody()->getContents());
+
         $names = [];
         foreach ($response as $item) {
-            $item = (array)$item;
-            $user = new NameHistoryUser($item['name'], $item['changedToAt'] ?? null);
+            $user = new NameHistoryResponse($item->name, $item->changedToAt ?? null);
             $names[] = $user;
         }
+
         return $names;
     }
 
@@ -140,7 +169,7 @@ class MojangAPI
      * @return string
      * @see MojangAPI::getSkinUrl()
      */
-    public static function renderHead(string $url, int $size = 64, bool $onlyBase64 = false): string
+    public function renderHead(string $url, int $size = 64, bool $onlyBase64 = false): string
     {
         return Renderer::renderHead($url, $size, $onlyBase64);
     }
@@ -149,51 +178,49 @@ class MojangAPI
      * Authenticates a user using their password.
      * @param string $email
      * @param string $password
-     * @return AuthenticatedUser
+     * @return AuthenticatedUserResponse
      * @throws ForbiddenOperationException
      * @link https://wiki.vg/Authentication#Authenticate
      */
-    public static function authenticate(string $email, string $password): AuthenticatedUser
+    public function authenticate(string $email, string $password): AuthenticatedUserResponse
     {
-        $data = [
-            "agent" => [
-                "name" => "Minecraft",
-                "version" => 1,
-            ],
-            "username" => "$email",
-            "password" => "$password",
-        ];
+        try {
+            $response = $this->client->post('https://authserver.mojang.com/authenticate', [
+                'json' => [
+                    "agent" => [
+                        "name" => "Minecraft",
+                        "version" => 1,
+                    ],
+                    "username" => $email,
+                    "password" => $password,
+                ]
+            ]);
 
-        $curl = curl_init("https://authserver.mojang.com/authenticate");
-        curl_setopt($curl, CURLOPT_POST, true);
-        curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($data));
-        curl_setopt($curl, CURLOPT_HTTPHEADER, [
-            'Content-Type: application/json'
-        ]);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        $client = curl_exec($curl);
-        $client = json_decode($client, true);
-
-        if (is_null($client)) {
-            throw new ForbiddenOperationException('Too many login attempts');
-        }
-        if (array_key_exists('error', $client)) {
-            throw new ForbiddenOperationException($client['errorMessage']);
+        } catch (GuzzleException $exception) {
+            $errorMessage = (json_decode($exception->getResponse()->getBody()->getContents()))->errorMessage;
+            throw new ForbiddenOperationException($errorMessage, $exception->getCode());
         }
 
-        return new AuthenticatedUser($client);
+        return new AuthenticatedUserResponse($this, json_decode($response->getBody()->getContents()));
     }
 
     /**
      * Fetches information about the current account
      * @param string $token
-     * @return ProfileInformation
+     * @return ProfileInformationResponse
+     * @throws GuzzleException
      * @link https://wiki.vg/Mojang_API#Profile_Information
      */
-    public static function getProfileInformation(string $token): ProfileInformation
+    public function getProfileInformation(string $token): ProfileInformationResponse
     {
-        $response = self::authRequest("https://api.minecraftservices.com/minecraft/profile", "GET", $token);
-        return new ProfileInformation(json_decode($response, true));
+        $response = $this->client->get('https://api.minecraftservices.com/minecraft/profile', [
+            'headers' =>
+                [
+                    'Authorization' => 'Bearer ' . $token,
+                ],
+        ]);
+
+        return new ProfileInformationResponse(json_decode($response->getBody()->getContents()));
     }
 
     /**
@@ -201,43 +228,28 @@ class MojangAPI
      * @param $name
      * @param $token
      * @return bool
+     * @throws GuzzleException
      * @link https://wiki.vg/Mojang_API#Name_Availability
      */
-    public static function nameAvailability($name, $token): bool
+    public function nameAvailability($name, $token): bool
     {
-        $response = self::authRequest("https://api.minecraftservices.com/minecraft/profile/name/$name/available", 'GET', $token);
-        $response = json_decode($response);
-        if ($response->status === "AVAILABLE") {
-            return true;
-        }
-        return false;
-    }
-
-    private static function authRequest(string $url, string $method, string $token)
-    {
-        $curl = curl_init($url);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, strtoupper($method));
-        curl_setopt($curl, CURLOPT_HTTPHEADER, [
-            "Authorization: Bearer $token"
+        $response = $this->client->get(sprintf('https://api.minecraftservices.com/minecraft/profile/name/%s/available', $name), [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $token,
+            ],
         ]);
-        return curl_exec($curl);
-    }
 
-    private static function request(string $url, bool $isPost = false, array $data = null)
-    {
-        $curl = curl_init($url);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        if ($isPost) {
-            curl_setopt($curl, CURLOPT_HTTPHEADER, [
-                'Content-Type: application/json',
-            ]);
-            curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($data));
-            curl_setopt($curl, CURLOPT_POST, true);
+        $response = json_decode($response->getBody()->getContents());
+
+        if ($response->status === "DUPLICATE") {
+            return false;
         }
 
-        $response = curl_exec($curl);
-        curl_close($curl);
-        return $response;
+        return true;
+    }
+
+    private function getDecodedResponse(Response $response)
+    {
+        return json_decode($response->getBody()->getContents());
     }
 }
