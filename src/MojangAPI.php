@@ -225,15 +225,15 @@ class MojangAPI
 
     /**
      * Check if the given name is available.
-     * @param $name
-     * @param $token
+     * @param string $name
+     * @param string $token
      * @return bool
      * @throws GuzzleException
      * @link https://wiki.vg/Mojang_API#Name_Availability
      */
-    public function nameAvailability($name, $token): bool
+    public function nameAvailability(string $username, string $token): bool
     {
-        $response = $this->client->get(sprintf('https://api.minecraftservices.com/minecraft/profile/name/%s/available', $name), [
+        $response = $this->client->get(sprintf('https://api.minecraftservices.com/minecraft/profile/name/%s/available', $username), [
             'headers' => [
                 'Authorization' => 'Bearer ' . $token,
             ],
