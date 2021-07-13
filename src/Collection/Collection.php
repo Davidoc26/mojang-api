@@ -5,9 +5,18 @@ declare(strict_types=1);
 namespace MojangAPI\Collection;
 
 
+use ArrayIterator;
+use MojangAPI\Response\Item;
 use Traversable;
 
 abstract class Collection implements \IteratorAggregate
 {
-    abstract public function getIterator(): Traversable;
+    protected array $collection;
+
+    public function getIterator(): Traversable
+    {
+        return new ArrayIterator($this->collection);
+    }
+
+    abstract public function add(Item $item): void;
 }
