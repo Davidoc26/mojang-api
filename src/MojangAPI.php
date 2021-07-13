@@ -6,12 +6,13 @@ namespace MojangAPI;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Response;
+use MojangAPI\Collection\NameHistoryCollection;
 use MojangAPI\Collection\ServiceItemCollection;
 use MojangAPI\Exception\ForbiddenOperationException;
 use MojangAPI\Exception\IllegalArgumentException;
 use MojangAPI\Renderer\Renderer;
 use MojangAPI\Response\AuthenticatedUserResponse;
-use MojangAPI\Response\NameHistoryResponse;
+use MojangAPI\Response\NameHistoryItem;
 use MojangAPI\Response\ProfileInformationResponse;
 use MojangAPI\Response\ProfileResponse;
 use MojangAPI\Response\ServiceItem;
@@ -115,7 +116,7 @@ class MojangAPI
      * @throws GuzzleException
      * @throws IllegalArgumentException
      */
-    public function usernamesToUuids(array $nicknames, $toUserResponse = true): array
+    public function usernamesToUuids(array $nicknames, bool $toUserResponse = true): array
     {
         if (count($nicknames) > 10) {
             throw new IllegalArgumentException('Not more that 10 profile name per call is allowed.');
@@ -143,21 +144,21 @@ class MojangAPI
      *
      * @link https://wiki.vg/Mojang_API#UUID_to_Name_History
      * @param string $uuid
-     * @return array
+     * @return NameHistoryCollection
      * @throws GuzzleException
      */
-    public function getNameHistory(string $uuid): array
+    public function getNameHistory(string $uuid): NameHistoryCollection
     {
         $response = $this->client->get(sprintf('https://api.mojang.com/user/profiles/%s/names', $uuid));
         $response = json_decode($response->getBody()->getContents());
 
-        $names = [];
+        $namesHistory = new NameHistoryCollection();
         foreach ($response as $item) {
-            $user = new NameHistoryResponse($item->name, $item->changedToAt ?? null);
-            $names[] = $user;
+            $user = new NameHistoryItem($item->name, $item->changedToAt ?? null);
+            $namesHistory->add($user);
         }
 
-        return $names;
+        return $namesHistory;
     }
 
     /**

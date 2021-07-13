@@ -6,10 +6,11 @@ namespace MojangAPI\Collection;
 
 
 use ArrayIterator;
+use IteratorAggregate;
 use MojangAPI\Response\Item;
 use Traversable;
 
-abstract class Collection implements \IteratorAggregate
+abstract class Collection implements IteratorAggregate
 {
     protected array $collection;
 
