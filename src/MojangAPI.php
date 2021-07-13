@@ -226,7 +226,7 @@ class MojangAPI
 
     /**
      * Check if the given name is available.
-     * @param string $name
+     * @param string $username
      * @param string $token
      * @return bool
      * @throws GuzzleException
