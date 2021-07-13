@@ -59,7 +59,7 @@ $user->getUuid();
 $user->getAccessToken();
 $user->nameAvailability($newName); 
 
-// You can also rend~~~~er the head of the current player.
+// You can also render the head of the current player.
 $user->renderHead($size);
 ```
 
