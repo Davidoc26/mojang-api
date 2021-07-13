@@ -12,11 +12,16 @@ use Traversable;
 
 abstract class Collection implements IteratorAggregate
 {
-    protected array $collection;
+    protected array $collection = [];
 
     public function getIterator(): Traversable
     {
         return new ArrayIterator($this->collection);
+    }
+
+    public function count(): int
+    {
+        return $this->getIterator()->count();
     }
 
     abstract public function add(Item $item): void;
