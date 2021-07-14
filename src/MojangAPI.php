@@ -38,7 +38,7 @@ class MojangAPI
     public function apiStatus(): ServiceItemCollection
     {
         $response = $this->client->get('https://status.mojang.com/check');
-        $response = json_decode($response->getBody()->getContents());
+        $response = $this->getDecodedResponse($response);
 
         $services = new ServiceItemCollection();
         foreach ($response as $service) {
@@ -149,7 +149,7 @@ class MojangAPI
     public function getNameHistory(string $uuid): NameHistoryCollection
     {
         $response = $this->client->get(sprintf('https://api.mojang.com/user/profiles/%s/names', $uuid));
-        $response = json_decode($response->getBody()->getContents());
+        $response = $this->getDecodedResponse($response);
 
         $namesHistory = new NameHistoryCollection();
         foreach ($response as $item) {
@@ -200,7 +200,7 @@ class MojangAPI
             $errorMessage = (json_decode($exception->getResponse()->getBody()->getContents()))->errorMessage;
             throw new ForbiddenOperationException($errorMessage, $exception->getCode());
         }
-        return new AuthenticatedUserResponse($this, json_decode($response->getBody()->getContents()));
+        return new AuthenticatedUserResponse($this, $this->getDecodedResponse($response));
     }
 
     /**
@@ -219,7 +219,7 @@ class MojangAPI
                 ],
         ]);
 
-        return new ProfileInformationResponse(json_decode($response->getBody()->getContents()));
+        return new ProfileInformationResponse($this->getDecodedResponse($response));
     }
 
     /**
@@ -238,7 +238,7 @@ class MojangAPI
             ],
         ]);
 
-        $response = json_decode($response->getBody()->getContents());
+        $response = $this->getDecodedResponse($response);
 
         if ($response->status === "DUPLICATE") {
             return false;
