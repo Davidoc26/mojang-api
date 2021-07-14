@@ -98,7 +98,6 @@ class MojangAPI
         $response = $this->client->get(sprintf("https://sessionserver.mojang.com/session/minecraft/profile/%s", $uuid));
 
         $response = $this->getDecodedResponse($response);
-
         if ($decodeBase64) {
             $response->properties[0]->value = json_decode(base64_decode($response->properties[0]->value));
         }
@@ -201,7 +200,6 @@ class MojangAPI
             $errorMessage = (json_decode($exception->getResponse()->getBody()->getContents()))->errorMessage;
             throw new ForbiddenOperationException($errorMessage, $exception->getCode());
         }
-
         return new AuthenticatedUserResponse($this, json_decode($response->getBody()->getContents()));
     }
 

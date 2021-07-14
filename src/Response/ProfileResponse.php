@@ -28,4 +28,9 @@ class ProfileResponse implements User
     {
         return $this->profile->properties[0]->value->textures->SKIN->url;
     }
+
+    public function getCapeUrl(): ?string
+    {
+        return $this->profile->properties[0]->value->textures->CAPE->url;
+    }
 }
