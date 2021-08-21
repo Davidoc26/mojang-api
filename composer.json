@@ -23,7 +23,7 @@
   },
   "autoload": {
     "psr-4": {
-      "MojangAPI\\": "src"
+      "Davidoc26\\MojangAPI\\": "src"
     }
   },
   "require-dev": {

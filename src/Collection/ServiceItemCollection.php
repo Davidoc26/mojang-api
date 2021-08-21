@@ -2,12 +2,12 @@
 declare(strict_types=1);
 
 
-namespace MojangAPI\Collection;
+namespace Davidoc26\MojangAPI\Collection;
 
 
 use InvalidArgumentException;
-use MojangAPI\Response\Item;
-use MojangAPI\Response\ServiceItem;
+use Davidoc26\MojangAPI\Response\Item;
+use Davidoc26\MojangAPI\Response\ServiceItem;
 
 class ServiceItemCollection extends Collection
 {

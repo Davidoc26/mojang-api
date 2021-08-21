@@ -2,12 +2,12 @@
 declare(strict_types=1);
 
 
-namespace MojangAPI\Collection;
+namespace Davidoc26\MojangAPI\Collection;
 
 
 use ArrayIterator;
 use IteratorAggregate;
-use MojangAPI\Response\Item;
+use Davidoc26\MojangAPI\Response\Item;
 use Traversable;
 
 abstract class Collection implements IteratorAggregate

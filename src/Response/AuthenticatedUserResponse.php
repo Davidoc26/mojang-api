@@ -2,11 +2,11 @@
 declare(strict_types=1);
 
 
-namespace MojangAPI\Response;
+namespace Davidoc26\MojangAPI\Response;
 
 
+use Davidoc26\MojangAPI\MojangAPI;
 use GuzzleHttp\Exception\GuzzleException;
-use MojangAPI\MojangAPI;
 
 
 class AuthenticatedUserResponse extends UserResponse

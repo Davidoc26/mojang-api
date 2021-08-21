@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 
-namespace MojangAPI\Renderer;
+namespace Davidoc26\MojangAPI\Renderer;
 
 
 class Renderer

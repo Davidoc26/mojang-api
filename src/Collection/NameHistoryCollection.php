@@ -2,11 +2,11 @@
 declare(strict_types=1);
 
 
-namespace MojangAPI\Collection;
+namespace Davidoc26\MojangAPI\Collection;
 
 
-use MojangAPI\Response\Item;
-use MojangAPI\Response\NameHistoryItem;
+use Davidoc26\MojangAPI\Response\Item;
+use Davidoc26\MojangAPI\Response\NameHistoryItem;
 
 class NameHistoryCollection extends Collection
 {

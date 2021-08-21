@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 
-namespace MojangAPI\Response;
+namespace Davidoc26\MojangAPI\Response;
 
 
 class ProfileInformationResponse implements User

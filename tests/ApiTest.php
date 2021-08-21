@@ -2,17 +2,17 @@
 declare(strict_types=1);
 
 
+use Davidoc26\MojangAPI\Collection\NameHistoryCollection;
+use Davidoc26\MojangAPI\Collection\ServiceItemCollection;
+use Davidoc26\MojangAPI\Exception\ForbiddenOperationException;
+use Davidoc26\MojangAPI\Exception\IllegalArgumentException;
+use Davidoc26\MojangAPI\MojangAPI;
+use Davidoc26\MojangAPI\Response\AuthenticatedUserResponse;
+use Davidoc26\MojangAPI\Response\ProfileInformationResponse;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Response;
-use MojangAPI\Collection\NameHistoryCollection;
-use MojangAPI\Collection\ServiceItemCollection;
-use MojangAPI\Exception\ForbiddenOperationException;
-use MojangAPI\Exception\IllegalArgumentException;
-use MojangAPI\MojangAPI;
-use MojangAPI\Response\AuthenticatedUserResponse;
-use MojangAPI\Response\ProfileInformationResponse;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 

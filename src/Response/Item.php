@@ -1,7 +1,7 @@
 <?php
 
 
-namespace MojangAPI\Response;
+namespace Davidoc26\MojangAPI\Response;
 
 
 interface Item
