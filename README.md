@@ -13,6 +13,8 @@ composer require davidoc26/mojang-api
 #### Get status of Mojang services
 
 ```php
+use Davidoc26\MojangAPI\MojangAPI;
+
 $mojangAPI = new MojangAPI();
 
 $services = $mojangAPI->apiStatus();
