@@ -21,7 +21,7 @@ class NameHistoryCollection extends Collection
 
     public function sortByChangedToAt(): self
     {
-        usort($this->collection, function ($first, $second) {
+        usort($this->collection, function (NameHistoryItem $first, NameHistoryItem $second) {
             if ($first->getChangedToAt() === $second->getChangedToAt()) {
                 return 0;
             }

@@ -17,6 +17,7 @@ use Davidoc26\MojangAPI\Response\ProfileInformationResponse;
 use Davidoc26\MojangAPI\Response\ProfileResponse;
 use Davidoc26\MojangAPI\Response\ServiceItem;
 use Davidoc26\MojangAPI\Response\UserResponse;
+use Psr\Http\Message\ResponseInterface;
 
 
 class MojangAPI
@@ -198,7 +199,7 @@ class MojangAPI
 
         } catch (GuzzleException $exception) {
             $errorMessage = (json_decode($exception->getResponse()->getBody()->getContents()))->errorMessage;
-            throw new ForbiddenOperationException($errorMessage, $exception->getCode());
+            throw new ForbiddenOperationException($errorMessage, (int)$exception->getCode());
         }
         return new AuthenticatedUserResponse($this, $this->getDecodedResponse($response));
     }
@@ -247,7 +248,7 @@ class MojangAPI
         return true;
     }
 
-    private function getDecodedResponse(Response $response)
+    private function getDecodedResponse(ResponseInterface $response)
     {
         return json_decode($response->getBody()->getContents());
     }

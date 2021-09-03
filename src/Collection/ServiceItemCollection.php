@@ -20,9 +20,9 @@ class ServiceItemCollection extends Collection
         $this->collection[] = $item;
     }
 
-    public function sortByName($desc = false): self
+    public function sortByName(bool $desc = false): self
     {
-        usort($this->collection, function ($first, $second) use ($desc) {
+        usort($this->collection, function (ServiceItem $first, ServiceItem $second) use ($desc) {
             if ($desc) {
                 return strcmp($second->getName(), $first->getName());
             }
@@ -32,9 +32,9 @@ class ServiceItemCollection extends Collection
         return $this;
     }
 
-    public function sortByStatus($desc = false): self
+    public function sortByStatus(bool $desc = false): self
     {
-        usort($this->collection, function ($first, $second) {
+        usort($this->collection, function (ServiceItem $first, ServiceItem $second) {
             $firstName = strtolower($first->getStatus());
             $secondName = strtolower($second->getStatus());
 

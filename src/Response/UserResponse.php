@@ -12,21 +12,27 @@ class UserResponse implements User
 {
     protected MojangAPI $mojangAPI;
     protected string $name;
-    protected ?string $uuid;
+    protected string $uuid;
 
-    public function __construct(MojangAPI $mojangAPI, string $name, ?string $uuid = null)
+    public function __construct(MojangAPI $mojangAPI, string $name, string $uuid)
     {
         $this->mojangAPI = $mojangAPI;
         $this->name = $name;
         $this->uuid = $uuid;
     }
 
+    /**
+     * @return string
+     */
     public function getName(): string
     {
         return $this->name;
     }
 
-    public function getUuid(): ?string
+    /**
+     * @return string
+     */
+    public function getUuid(): string
     {
         return $this->uuid;
     }

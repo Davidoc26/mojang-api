@@ -13,7 +13,7 @@ class NameHistoryItem implements User, Item
     public function __construct(string $name, ?int $changedToAt = null)
     {
         $this->name = $name;
-        $this->changedToAt = $changedToAt ? $changedToAt / 1000 : null;
+        $this->changedToAt = (int)($changedToAt ? $changedToAt / 1000 : null);
     }
 
     public function getName(): string
