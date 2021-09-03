@@ -8,6 +8,7 @@ use Davidoc26\MojangAPI\Collection\ServiceItemCollection;
 use Davidoc26\MojangAPI\Exception\ForbiddenOperationException;
 use Davidoc26\MojangAPI\Exception\IllegalArgumentException;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Response;
 use Davidoc26\MojangAPI\Renderer\Renderer;
@@ -197,7 +198,7 @@ class MojangAPI
                 ]
             ]);
 
-        } catch (GuzzleException $exception) {
+        } catch (ClientException $exception) {
             $errorMessage = (json_decode($exception->getResponse()->getBody()->getContents()))->errorMessage;
             throw new ForbiddenOperationException($errorMessage, (int)$exception->getCode());
         }
@@ -248,6 +249,10 @@ class MojangAPI
         return true;
     }
 
+    /**
+     * @param ResponseInterface $response
+     * @return mixed
+     */
     private function getDecodedResponse(ResponseInterface $response)
     {
         return json_decode($response->getBody()->getContents());

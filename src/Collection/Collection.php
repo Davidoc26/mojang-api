@@ -14,7 +14,7 @@ abstract class Collection implements IteratorAggregate
 {
     protected array $collection = [];
 
-    public function getIterator(): Traversable
+    public function getIterator(): ArrayIterator
     {
         return new ArrayIterator($this->collection);
     }
