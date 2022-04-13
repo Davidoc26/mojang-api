@@ -2,6 +2,11 @@
 
 Simple and easy class to use
 
+[![Latest Stable Version](http://poser.pugx.org/davidoc26/mojang-api/v)](https://packagist.org/packages/davidoc26/mojang-api) 
+[![Total Downloads](http://poser.pugx.org/davidoc26/mojang-api/downloads)](https://packagist.org/packages/davidoc26/mojang-api) 
+[![License](http://poser.pugx.org/davidoc26/mojang-api/license)](https://packagist.org/packages/davidoc26/mojang-api) 
+[![PHP Version Require](http://poser.pugx.org/davidoc26/mojang-api/require/php)](https://packagist.org/packages/davidoc26/mojang-api)
+
 ## Installation
 
 ```bash
