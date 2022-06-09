@@ -31,7 +31,7 @@ class MojangAPI
     }
 
     /**
-     * Return status of various Mojang services.
+     * @deprecated Closed down by Mojang on 8 october 2021 due to incorrect status responses.
      *
      * @link https://wiki.vg/Mojang_API#API_Status
      * @return ServiceItemCollection
