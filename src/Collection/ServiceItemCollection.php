@@ -5,10 +5,16 @@ declare(strict_types=1);
 namespace Davidoc26\MojangAPI\Collection;
 
 
+use Davidoc26\MojangAPI\MojangAPI;
 use InvalidArgumentException;
 use Davidoc26\MojangAPI\Response\Item;
 use Davidoc26\MojangAPI\Response\ServiceItem;
 
+/**
+ * @deprecated
+ *
+ * @see MojangAPI::apiStatus()
+ */
 class ServiceItemCollection extends Collection
 {
     public function add(Item $item): void

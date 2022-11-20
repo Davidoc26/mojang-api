@@ -10,7 +10,6 @@ use Davidoc26\MojangAPI\Exception\IllegalArgumentException;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\GuzzleException;
-use GuzzleHttp\Psr7\Response;
 use Davidoc26\MojangAPI\Renderer\Renderer;
 use Davidoc26\MojangAPI\Response\AuthenticatedUserResponse;
 use Davidoc26\MojangAPI\Response\NameHistoryItem;
@@ -141,6 +140,10 @@ class MojangAPI
     }
 
     /**
+     * @deprecated This endpoint has been deprecated by Mojang and was removed on 13 September 2022 at 9:25 AM CET to
+     * "improve player safety and data privacy".
+     * @link https://help.minecraft.net/hc/en-us/articles/8969841895693-Username-History-API-Removal-FAQ Removal announcement
+     *
      * Get all names history by uuid.
      *
      * @link https://wiki.vg/Mojang_API#UUID_to_Name_History

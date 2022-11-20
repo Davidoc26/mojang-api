@@ -5,9 +5,15 @@ declare(strict_types=1);
 namespace Davidoc26\MojangAPI\Collection;
 
 
+use Davidoc26\MojangAPI\MojangAPI;
 use Davidoc26\MojangAPI\Response\Item;
 use Davidoc26\MojangAPI\Response\NameHistoryItem;
 
+/**
+ * @deprecated
+ *
+ * @see MojangAPI::getNameHistory()
+ */
 class NameHistoryCollection extends Collection
 {
     public function add(Item $item): void
